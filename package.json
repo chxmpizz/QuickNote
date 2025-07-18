@@ -7,17 +7,26 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "api": "bun run --watch server/index.ts "
+    "api": "bun run --watch server/index.ts ",
+    "format": "prettier --write"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@supabase/supabase-js": "^2.50.5",
     "axios": "^1.10.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "elysia": "^1.3.5",
+    "lucide-react": "^0.525.0",
     "next": "15.3.5",
+    "prettier": "^3.6.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -29,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.5",
     "typescript": "^5"
   }
 }
