@@ -8,12 +8,31 @@ interface taskProps {
     title : string
     content : string
 }
+interface userProps {
+    email : string,
+    password : string,
+    name : string
+  }
 
 app.use(cors())
 
 app.get("/api/users", async () => {
     try {
         const res = await supabaseClient.from('users').select()
+        return res.data
+    } catch (error) {
+        console.log('error select users -> ' , error)
+    }
+});
+app.post("/api/users", async ({body} : {body : userProps}) => {
+    const {email , password , name} = body
+    try {
+        const res = await supabaseClient.from('users').insert({
+            email , 
+            password,
+            name
+        })
+        console.log(res)
         return res.data
     } catch (error) {
         console.log('error select users -> ' , error)
