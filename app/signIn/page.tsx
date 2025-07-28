@@ -7,7 +7,7 @@ import { TypeAnimation } from 'react-type-animation';
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 import Image from 'next/image';
-import TestImage from '../public/test.png';
+import Diary from '../public/Diary.png';
 import { supabaseClient } from '@/server/libs/supabase-client';
 
 const SignIn = () => {
@@ -109,7 +109,7 @@ const SignIn = () => {
         </div>
       </div>
       <div className="mx-auto">
-        <Image src={TestImage} alt="test image" width={600} height={200} />
+        <Image src={Diary} alt="test image" width={600} height={200} />
       </div>
     </div>
   );

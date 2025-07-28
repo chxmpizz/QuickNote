@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import SignIn from './signIn/page';
 import { supabaseClient } from '@/server/libs/supabase-client';
-import Home from './pages/Home';
+// import Home from './pages/Home';
 import Navbar from '@/components/Navbar';
 import type { Session } from '@supabase/supabase-js';
 
@@ -33,9 +33,9 @@ const Page = () => {
     <div>
       {session? (
         <div className='flex'>
-          <Navbar />
+          <Navbar name={session.user.user_metadata.name} image={session.user.user_metadata.image}/>
           <div>
-            <Home />
+            {/* <Home /> */}
           </div>
         </div>
       ) : (
