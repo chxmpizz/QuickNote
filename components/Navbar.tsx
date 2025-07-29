@@ -39,8 +39,8 @@ const Navbar = ({ name, image }: UserProps) => {
     }
   };
   return (
-    <div className="flex h-full w-full items-center justify-center py-4">
-      <nav className="flex w-auto items-center justify-around rounded-xl border-2  bg-white px-4 py-2">
+    <div className="flex h-full w-full items-center bg-red-300 justify-center py-4">
+      <nav className="flex w-auto items-center justify-around rounded-xl border-2 bg-white px-4 py-2">
         <Link
           href="#"
           className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
