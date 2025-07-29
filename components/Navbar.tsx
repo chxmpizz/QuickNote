@@ -17,7 +17,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from './ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Label } from './ui/label';
 
 interface UserProps {
@@ -26,9 +30,10 @@ interface UserProps {
 }
 
 const Navbar = ({ name, image }: UserProps) => {
-  const [form , setForm] = useState('')
- 
-  const handleLogout = async () => {''
+  const [form, setForm] = useState('');
+
+  const handleLogout = async () => {
+    '';
     try {
       const { error } = await supabaseClient.auth.signOut();
       if (error) {
@@ -39,8 +44,8 @@ const Navbar = ({ name, image }: UserProps) => {
     }
   };
   return (
-    <div className="flex h-full w-full items-center bg-red-300 justify-center py-4">
-      <nav className="flex w-auto items-center justify-around rounded-xl border-2 bg-white px-4 py-2">
+    <div className="flex h-full w-full items-center justify-center py-4">
+      <nav className="flex w-auto items-center justify-around rounded-xl border-2 border-[#6B4EFF] bg-white px-4 py-2">
         <Link
           href="#"
           className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
@@ -62,36 +67,48 @@ const Navbar = ({ name, image }: UserProps) => {
 
         <div className="flex items-center">
           <Popover>
-            <PopoverTrigger className='cursor-pointer'>
+            <PopoverTrigger className="cursor-pointer">
               {' '}
               <Avatar className="h-10 w-10">
                 <AvatarImage src={image} />
-                <AvatarFallback className="text-center">{name[0]}</AvatarFallback>
+                <AvatarFallback className="text-center text-xl font-bold text-[#6B4EFF]">
+                  {name[0]}
+                </AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent className="flex items-center justify-between">
               {' '}
-              <div className='flex text-[#2A2251]'>
-                <h1 className="text-xl font-bold mr-2">{name.toUpperCase()}</h1>
-                <Dialog >
-                  <DialogTrigger className='cursor-pointer'>
-                    <FontAwesomeIcon icon={faPenToSquare}/>
+              <div className="flex text-[#2A2251]">
+                <h1 className="mr-2 text-xl font-bold">{name.toUpperCase()}</h1>
+                <Dialog>
+                  <DialogTrigger className="cursor-pointer">
+                    <FontAwesomeIcon icon={faPenToSquare} />
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Profile Edit</DialogTitle>
                       <DialogDescription>
-                        <div className='space-y-2'>
-                 
-                        <Label htmlFor='name' >Name</Label>
-                        <Input id="name" type='text' placeholder={name} value={form} onChange={(e) => setForm(e.target.value)}/>
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Name</Label>
+                          <Input
+                            id="name"
+                            type="text"
+                            placeholder={name}
+                            value={form}
+                            onChange={(e) => setForm(e.target.value)}
+                          />
                         </div>
                       </DialogDescription>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>
               </div>
-              <Button onClick={() => handleLogout()} className='bg-[#6B4EFF] font-semibold transition duration-200 cursor-pointer hover:bg-[#594e8b]'>Log Out</Button>
+              <Button
+                onClick={() => handleLogout()}
+                className="cursor-pointer bg-[#6B4EFF] font-semibold transition duration-200 hover:bg-[#594e8b]"
+              >
+                Log Out
+              </Button>
             </PopoverContent>
           </Popover>
         </div>
