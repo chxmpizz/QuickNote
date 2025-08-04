@@ -38,6 +38,20 @@ app.post('/api/users', async ({ body }: { body: userProps }) => {
     console.log('error select users -> ', error);
   }
 });
+app.put('/api/users/:id', async ({ body }: { body: userProps }) => {
+  const { email, password, name } = body;
+  try {
+    const res = await supabaseClient.from('users').insert({
+      email,
+      password,
+      name,
+    });
+    console.log(res);
+    return res.data;
+  } catch (error) {
+    console.log('error select users -> ', error);
+  }
+});
 
 app.post('/api/task', async ({ body }: { body: taskProps }) => {
   const { title, content } = body;

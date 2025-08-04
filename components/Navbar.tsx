@@ -11,7 +11,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  // DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -30,10 +30,11 @@ interface UserProps {
 }
 
 const Navbar = ({ name, image }: UserProps) => {
-  const [form, setForm] = useState('');
-
+  const [form, setForm] = useState({
+    name: '',
+    image: '',
+  });
   const handleLogout = async () => {
-    '';
     try {
       const { error } = await supabaseClient.auth.signOut();
       if (error) {
@@ -41,6 +42,30 @@ const Navbar = ({ name, image }: UserProps) => {
       }
     } catch (error) {
       console.log('error on log out handle -> ', error);
+    }
+  };
+  // const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   try {
+  //     await supabaseClient.from('users').update({
+  //       image: file,
+  //     });
+  //   } catch (error) {
+  //     console.log('error on ImageUpload -> ', error);
+  //   }
+  // };
+  const handleForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await supabaseClient.auth.updateUser({
+        data: {
+          name: form.name,
+          image: form.image,
+        },
+      });
+    } catch (error) {
+      console.log('error on handleForm -> ', error);
     }
   };
   return (
@@ -71,6 +96,7 @@ const Navbar = ({ name, image }: UserProps) => {
               {' '}
               <Avatar className="h-10 w-10">
                 <AvatarImage src={image} />
+
                 <AvatarFallback className="text-center text-xl font-bold text-[#6B4EFF]">
                   {name[0]}
                 </AvatarFallback>
@@ -79,26 +105,44 @@ const Navbar = ({ name, image }: UserProps) => {
             <PopoverContent className="flex items-center justify-between">
               {' '}
               <div className="flex text-[#2A2251]">
-                <h1 className="mr-2 text-xl font-bold">{name.toUpperCase()}</h1>
+                <h1 className="mr-2 text-xl font-bold">
+                  {name.toUpperCase().split(' ')[0]}
+                </h1>
                 <Dialog>
                   <DialogTrigger className="cursor-pointer">
                     <FontAwesomeIcon icon={faPenToSquare} />
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Profile Edit</DialogTitle>
-                      <DialogDescription>
-                        <div className="space-y-2">
-                          <Label htmlFor="name">Name</Label>
-                          <Input
-                            id="name"
-                            type="text"
-                            placeholder={name}
-                            value={form}
-                            onChange={(e) => setForm(e.target.value)}
-                          />
+                      <DialogTitle className="mb-2">Profile Edit</DialogTitle>
+                      <form className="space-y-3" onSubmit={handleForm}>
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder={name}
+                          value={form.name}
+                          onChange={(e) =>
+                            setForm({ ...form, name: e.target.value })
+                          }
+                        />
+                        <Label htmlFor="image">Image</Label>
+                        <Input
+                          id="image"
+                          type="file"
+                          placeholder={name}
+                          value={form.image}
+                          onChange={(e) =>
+                            setForm({ ...form, name: e.target.value })
+                          }
+                          className="file:border-0 file:border-e"
+                        />
+                        <div className="mt-2 flex items-center justify-center">
+                          <Button className="w-1/3 bg-[#6B4EFF] font-semibold">
+                            Save
+                          </Button>
                         </div>
-                      </DialogDescription>
+                      </form>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>
