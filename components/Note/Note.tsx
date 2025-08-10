@@ -60,10 +60,10 @@ const Note = ({ badge, title, content }: NoteProps) => {
     <div className="relative inline w-auto max-w-1/3">
       <Card>
         <CardHeader>
-          <CardTitle className="my-auto text-2xl font-bold">{title}</CardTitle>
-          <CardAction className="my-auto">
+          <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+          <CardAction className="mt-1">
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex h-full w-full">
+              <DropdownMenuTrigger className="h-full w-full">
                 <Badge className={`cursor-pointer`}>{badge}</Badge>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="border-none">

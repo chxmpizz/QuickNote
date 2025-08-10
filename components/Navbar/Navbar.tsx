@@ -11,7 +11,6 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import {
   Dialog,
   DialogContent,
-  // DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,6 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Label } from '../ui/label';
+import { usePathname } from 'next/navigation';
 
 interface UserProps {
   name: string;
@@ -30,6 +30,7 @@ interface UserProps {
 }
 
 const Navbar = ({ name, image }: UserProps) => {
+  const pathName = usePathname();
   const [form, setForm] = useState({
     name: '',
     image: null as File | null,
@@ -81,22 +82,24 @@ const Navbar = ({ name, image }: UserProps) => {
   };
   return (
     <div className="flex h-full w-full items-center justify-center py-4">
-      <nav className="flex w-auto items-center justify-around rounded-xl border-2 border-[#6B4EFF] bg-white px-4 py-2">
+      <nav
+        className={`flex w-auto items-center justify-around rounded-xl border-2 border-[#6B4EFF] bg-white px-4 py-2`}
+      >
         <Link
           href="#"
-          className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
+          className={`mx-2 rounded-lg px-2 py-1 shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 ${pathName === '/' ? 'bg-[#6B4EFF] text-white' : 'bg-neutral-200 text-[#2A2251] hover:bg-[#6B4EFF] hover:text-white'} `}
         >
           <FontAwesomeIcon icon={faNoteSticky} /> All Task
         </Link>
         <Link
-          href="#"
-          className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
+          href="/tags"
+          className={`mx-2 rounded-lg px-2 py-1 shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 ${pathName === '/tags' ? 'bg-[#6B4EFF] text-white' : 'bg-neutral-200 text-[#2A2251] hover:bg-[#6B4EFF] hover:text-white'} `}
         >
           <FontAwesomeIcon icon={faTags} /> Tags
         </Link>
         <Link
           href="/create"
-          className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
+          className={`mx-2 rounded-lg px-2 py-1 shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 ${pathName === '/create' ? 'bg-[#6B4EFF] text-white' : 'bg-neutral-200 text-[#2A2251] hover:bg-[#6B4EFF] hover:text-white'} `}
         >
           <FontAwesomeIcon icon={faPlus} /> Add new Tasks
         </Link>
