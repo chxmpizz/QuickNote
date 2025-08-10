@@ -7,6 +7,8 @@ const app = new Elysia();
 interface taskProps {
   title: string;
   content: string;
+  tags: string;
+  user_id?: number;
 }
 interface userProps {
   email: string;
@@ -54,21 +56,42 @@ app.put('/api/users/:id', async ({ body }: { body: userProps }) => {
 });
 
 app.post('/api/task', async ({ body }: { body: taskProps }) => {
-  const { title, content } = body;
+  const { title, content, tags } = body;
   try {
-    const res = await supabaseClient
-      .from('tasks')
-      .insert({
-        title,
-        content,
-      })
-      .select()
-      .single();
+    const res = await supabaseClient.from('tasks').insert({
+      title,
+      content,
+      tags,
+    });
+    console.log('Task created successfully:', res.data);
     return res.data;
   } catch (error) {
     console.log('error add task -> ', error);
   }
 });
+
+app.put(
+  '/api/task/:id',
+  async ({ body, params }: { body: taskProps; params: { id: number } }) => {
+    const { title, content, tags } = body;
+    const { id } = params;
+    try {
+      const res = await supabaseClient
+        .from('tasks')
+        .update({
+          title,
+          content,
+          tags,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      return res.data;
+    } catch (error) {
+      console.log('error add task -> ', error);
+    }
+  },
+);
 
 app.get('/api/task', async () => {
   try {
@@ -79,6 +102,6 @@ app.get('/api/task', async () => {
   }
 });
 
-app.listen(3003);
+app.listen(3001);
 
 console.log('Elysia is running from server/index.ts');

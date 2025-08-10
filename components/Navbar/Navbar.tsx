@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { supabaseClient } from '@/server/libs/supabase-client';
-import { AvatarImage, Avatar, AvatarFallback } from './ui/avatar';
+import { AvatarImage, Avatar, AvatarFallback } from '../ui/avatar';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faNoteSticky } from '@fortawesome/free-solid-svg-icons';
@@ -16,13 +16,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from './ui/input';
+import { Input } from '../ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Label } from './ui/label';
+import { Label } from '../ui/label';
 
 interface UserProps {
   name: string;
@@ -32,7 +32,7 @@ interface UserProps {
 const Navbar = ({ name, image }: UserProps) => {
   const [form, setForm] = useState({
     name: '',
-    image: '',
+    image: null as File | null,
   });
   const handleLogout = async () => {
     try {
@@ -44,24 +44,35 @@ const Navbar = ({ name, image }: UserProps) => {
       console.log('error on log out handle -> ', error);
     }
   };
-  // const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-  //   try {
-  //     await supabaseClient.from('users').update({
-  //       image: file,
-  //     });
-  //   } catch (error) {
-  //     console.log('error on ImageUpload -> ', error);
-  //   }
-  // };
+
   const handleForm = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let imgUrl = null;
+      if (form.image) {
+        const file = form.image as unknown as File;
+        const fileName = `${Date.now()}_${file.name}`;
+        console.log('fileName -> ', fileName);
+        const { data, error: uploadError } = await supabaseClient.storage
+          .from('Users')
+          .upload(fileName, file);
+        if (data) console.log('File uploaded successfully:', data);
+        if (uploadError) console.log('Error uploading file:', uploadError);
+        // Handle error
+
+        if (uploadError) throw uploadError;
+
+        // 2. Get public URL
+        const { data: urlData } = supabaseClient.storage
+          .from('Users')
+          .getPublicUrl(fileName);
+
+        imgUrl = urlData.publicUrl;
+      }
       await supabaseClient.auth.updateUser({
         data: {
           name: form.name,
-          image: form.image,
+          image: imgUrl,
         },
       });
     } catch (error) {
@@ -84,7 +95,7 @@ const Navbar = ({ name, image }: UserProps) => {
           <FontAwesomeIcon icon={faTags} /> Tags
         </Link>
         <Link
-          href="#"
+          href="/create"
           className="mx-2 rounded-lg bg-neutral-200 px-2 py-1 text-[#2A2251] shadow-[0px_2px_10px_1px_#e5e5e5] transition duration-150 hover:bg-[#6B4EFF] hover:text-white"
         >
           <FontAwesomeIcon icon={faPlus} /> Add new Tasks
@@ -131,11 +142,13 @@ const Navbar = ({ name, image }: UserProps) => {
                           id="image"
                           type="file"
                           placeholder={name}
-                          value={form.image}
                           onChange={(e) =>
-                            setForm({ ...form, name: e.target.value })
+                            setForm({
+                              ...form,
+                              image: e.target.files ? e.target.files[0] : null,
+                            })
                           }
-                          className="file:border-0 file:border-e"
+                          className="cursor-pointer file:border-0 file:border-e file:pr-5 file:pl-3"
                         />
                         <div className="mt-2 flex items-center justify-center">
                           <Button className="w-1/3 bg-[#6B4EFF] font-semibold">
