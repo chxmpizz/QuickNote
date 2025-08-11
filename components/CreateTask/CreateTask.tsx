@@ -19,21 +19,20 @@ import { z } from 'zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+
 export const taskSchema = z.object({
-  title: z
-    .string()
-    .min(2, 'Character must have at least 2 characters')
-    .max(100),
-  tags: z.string().min(2, 'Character must have at least 2 characters').max(100),
+  title: z.string().min(2, 'Character must have at least 2 characters').max(50),
+  tags: z.string().min(2, 'Character must have at least 2 characters').max(15),
   content: z.string(),
 });
 
-const TaskCreate = () => {
+const TaskCreate = ({ userId }: { userId: string | undefined }) => {
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       title: '',
       tags: '',
+      content: '',
     },
   });
   const router = useRouter();
@@ -43,6 +42,7 @@ const TaskCreate = () => {
         title: data.title,
         content: data.content,
         tags: data.tags,
+        userId,
       });
       router.push('/');
       form.reset();

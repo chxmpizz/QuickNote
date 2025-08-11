@@ -90,6 +90,7 @@ const Page = () => {
                         title={task.title}
                         badge={task.tags}
                         content={task.content}
+                        id={idx}
                       />
                     )}
                   </div>
