@@ -10,6 +10,7 @@ import NoteLoad from '@/components/Note/NoteLoad';
 import NavbarLoad from '@/components/Navbar/NavbarLoad';
 
 interface Task {
+  id: number;
   title: string;
   content: string;
   tags: string;
@@ -48,7 +49,6 @@ const Page = () => {
   };
   useEffect(() => {
     fetchSession();
-    console.log('session -> ', tasks);
     fetchTasks();
     updataProvider();
     const { data: authListen } = supabaseClient.auth.onAuthStateChange(
@@ -90,7 +90,7 @@ const Page = () => {
                         title={task.title}
                         badge={task.tags}
                         content={task.content}
-                        id={idx}
+                        id={task.id}
                       />
                     )}
                   </div>

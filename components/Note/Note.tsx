@@ -48,10 +48,7 @@ interface NoteProps {
   id: number;
 }
 const taskEditSchema = z.object({
-  title: z
-    .string()
-    .min(2, 'Character must have at least 2 characters')
-    .max(100),
+  title: z.string().max(100),
   content: z.string(),
 });
 
@@ -86,12 +83,13 @@ const Note = ({ badge, title, content, id }: NoteProps) => {
     data: z.infer<typeof taskEditSchema>;
     id: number;
   }) => {
-    console.log('data -> ', data, id);
+    console.log('data -> ', data.content, data.title, id);
     try {
-      await axios.put(`http://localhost:3001/api/task/${id + 1}`, {
+      await axios.put(`http://localhost:3001/api/task/${id}`, {
         title: data.title,
         content: data.content,
       });
+      window.location.reload();
     } catch (error) {
       console.log('error on changeTags -> ', error);
     }
@@ -102,6 +100,15 @@ const Note = ({ badge, title, content, id }: NoteProps) => {
       setTags(res.data.data);
     } catch (error) {
       console.log('error on tagsFetch -> ', error);
+    }
+  };
+  const deleteTask = async (id: number) => {
+    console.log('id -> ', id);
+    try {
+      await axios.delete(`http://localhost:3001/api/task/${id + 1}`);
+      window.location.reload();
+    } catch (error) {
+      console.log('error whit delete Task Function -> ', error);
     }
   };
   useEffect(() => {
@@ -143,7 +150,7 @@ const Note = ({ badge, title, content, id }: NoteProps) => {
         <CardContent className="text-md line-clamp-6">
           <p>{content}</p>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex items-center justify-between">
           <Dialog>
             <DialogTrigger className="text-md cursor-pointer rounded-md bg-[#6B4EFF] px-5 py-1.5 text-white duration-200 hover:bg-[#464063]">
               Edit
@@ -209,6 +216,12 @@ const Note = ({ badge, title, content, id }: NoteProps) => {
               </Form>
             </DialogContent>
           </Dialog>
+          <Button
+            className="text-md cursor-pointer bg-red-400"
+            onClick={() => deleteTask(id)}
+          >
+            delete
+          </Button>
         </CardFooter>
       </Card>
     </div>

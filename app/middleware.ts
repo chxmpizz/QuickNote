@@ -5,10 +5,10 @@ import { NextResponse, NextRequest } from 'next/server';
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
-  const cookie = request.cookies.get('nextjs');
-  console.log('cookie -> ', cookie);
-  const allCookies = request.cookies.getAll();
-  console.log('allCookie -> ', allCookies);
+  //   const cookie = request.cookies.get('nextjs');
+  //   console.log('cookie -> ', cookie);
+  //   const allCookies = request.cookies.getAll();
+  //   console.log('allCookie -> ', allCookies);
   request.cookies.has('nextjs'); // => true
   request.cookies.delete('nextjs');
   request.cookies.has('nextjs'); // => false
