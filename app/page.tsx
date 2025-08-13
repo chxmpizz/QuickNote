@@ -4,8 +4,8 @@ import SignIn from './(signIn)/page';
 import { supabaseClient } from '@/server/libs/supabase-client';
 import Note from '@/components/Note/Note';
 import Navbar from '@/components/Navbar/Navbar';
-import type { Session } from '@supabase/supabase-js';
 import axios from 'axios';
+import { Session } from '@supabase/supabase-js';
 import NoteLoad from '@/components/Note/NoteLoad';
 import NavbarLoad from '@/components/Navbar/NavbarLoad';
 
@@ -23,24 +23,23 @@ const Page = () => {
 
   const fetchSession = async () => {
     try {
-      const currentSession = await supabaseClient.auth.getSession();
-      setSession(currentSession.data.session);
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) {
+        console.error('Failed to get session:', error.message);
+        setSession(null);
+        return null;
+      } else if (!error && data.session) {
+        setSession(data.session);
+        await fetchTasks(data.session.user.id);
+      }
     } catch (error) {
       console.log('session error -> ', error);
     }
   };
-  const updataProvider = async () => {
+
+  const fetchTasks = async (id: string) => {
     try {
-      await axios.put(`http://localhost:3001/api/users/${session?.user.id}`, {
-        provider: session?.user.app_metadata.provider,
-      });
-    } catch (error) {
-      console.log('error on updataProvider -> ', error);
-    }
-  };
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get('http://localhost:3001/api/task');
+      const res = await axios.get(`http://localhost:3001/api/task/:${id}`);
       const fetchedTasks = Array.isArray(res.data.data) && res.data.data;
       setTasks(fetchedTasks || []);
     } catch (error) {
@@ -48,9 +47,12 @@ const Page = () => {
     }
   };
   useEffect(() => {
-    fetchSession();
-    fetchTasks();
-    updataProvider();
+    const init = async () => {
+      await fetchSession();
+    };
+    init();
+    setLoading(true);
+
     const { data: authListen } = supabaseClient.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -74,7 +76,7 @@ const Page = () => {
             ) : (
               <Navbar
                 name={session.user.user_metadata.name}
-                image={session.user.user_metadata.avatar_url}
+       
               />
             )}
           </div>

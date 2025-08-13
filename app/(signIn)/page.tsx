@@ -1,20 +1,44 @@
 'use client';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { TypeAnimation } from 'react-type-animation';
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 import Image from 'next/image';
 import Diary from '../public/Diary.png';
 import { supabaseClient } from '@/server/libs/supabase-client';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+export const signInSchema = z.object({
+  email: z.email('Please input your email'),
+  password: z.string('Please input your password'),
+});
+interface singInProps {
+  email: string;
+  password: string;
+}
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const handleSignIn = async (email: string, password: string) => {
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+  const handleSignIn = async ({ email, password }: singInProps) => {
     try {
+      // const pass_hash = await bcrypt.compare(password , )
       const data = await supabaseClient.auth.signInWithPassword({
         email,
         password,
@@ -29,9 +53,10 @@ const SignIn = () => {
       const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
       });
+      console.log(data);
       await supabaseClient.from('users').insert({
-        name : data
-      })
+        name: data,
+      });
       if (error) {
         console.log('error in OAuth -> ', error);
       } else {
@@ -71,56 +96,67 @@ const SignIn = () => {
           <p className="text-normal text-xl">This is a login Page</p>
         </div>
         {/*SignIn Form*/}
-        <form
-          className="w-8/10 space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSignIn(email, password);
-          }}
-        >
-          <div>
-            <Label htmlFor="email" className="inline-block text-lg">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((data) => handleSignIn(data))}
+            className="w-7/10 space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="email" className="text-xl font-semibold">
+                    Email
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="email"
+                      className="mt-2 w-full focus-visible:border-red-300"
+                      placeholder="Email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="password" className="inline-block text-lg">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="password"
+                    className="text-xl font-semibold"
+                  >
+                    Password
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      id="password"
+                      className="mt-2 w-full focus-visible:border-red-300"
+                      placeholder="Password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-
-          {/*Forget Password*/}
-          <div className="text-end text-sm duration-200 hover:text-red-300">
-            <Link href={'#'}>Forget Password?</Link>
-          </div>
-
-          {/*OAuth SignIn*/}
-          <div className="mt-7 flex flex-col items-center justify-center">
-            <Button className="h-10 w-7/10 cursor-pointer bg-red-500 text-lg duration-300 hover:bg-red-700">
+            <Button className="h-10 w-full cursor-pointer bg-red-500 text-lg duration-300 hover:bg-red-700">
               Sign In
             </Button>
-            <Button
-              className="mt-3 h-10 w-7/10 cursor-pointer text-lg"
-              onClick={googleHandler}
-            >
-              Sign In With Google <FcGoogle />
-            </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
+        <Button
+          className="h-10 w-7/10 cursor-pointer text-lg"
+          onClick={googleHandler}
+        >
+          Sign In With Google <FcGoogle />
+        </Button>
+
         <div className="flex items-center justify-center">
           <p className="text-sm">
             {"Don't"} hava a Account?{' '}
@@ -141,3 +177,49 @@ const SignIn = () => {
 };
 
 export default SignIn;
+
+{
+  /*
+   <form
+          className="w-8/10 space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSignIn(email, password);
+          }}
+        >
+          <div>
+            <Label htmlFor="email" className="inline-block text-lg">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+                
+            />
+          </div>
+          <div>
+            <Label htmlFor="password" className="inline-block text-lg">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-2 w-full focus-visible:border-red-300"
+            />
+          </div>
+
+          {/*Forget Password*/
+}
+// <div className="text-end text-sm duration-200 hover:text-red-300">
+//   <Link href={'#'}>Forget Password?</Link>
+// </div>
+
+{
+  /*OAuth SignIn*/
+}
+
+// </form>

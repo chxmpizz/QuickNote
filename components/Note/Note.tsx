@@ -105,7 +105,7 @@ const Note = ({ badge, title, content, id }: NoteProps) => {
   const deleteTask = async (id: number) => {
     console.log('id -> ', id);
     try {
-      await axios.delete(`http://localhost:3001/api/task/${id + 1}`);
+      await axios.delete(`http://localhost:3001/api/task/${id}`);
       window.location.reload();
     } catch (error) {
       console.log('error whit delete Task Function -> ', error);

@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia';
 import { supabaseClient } from '../libs/supabase-client';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 
 interface userProps {
@@ -9,6 +9,7 @@ interface userProps {
   name: string;
   img?: string;
   uuid: string;
+  provider: string;
 }
 
 export const userRoutes = (app: Elysia) => {
@@ -21,9 +22,10 @@ export const userRoutes = (app: Elysia) => {
 
   // POST user
   app.post('/api/users', async ({ body }: { body: userProps }) => {
-    const { email, password, name, img } = body;
+    const { email, password, name, provider, uuid } = body;
 
-    const uuid = uuidv4();
+    // const uuid = uuidv4();
+    // console.log(uuid);
     const passwordHash = await bcrypt.hash(password, 10);
 
     const { error } = await supabaseClient.from('users').insert({
@@ -31,7 +33,7 @@ export const userRoutes = (app: Elysia) => {
       email,
       password: passwordHash,
       name,
-      image: img || null,
+      provider,
     });
 
     if (error) return { error: error.message };
@@ -39,11 +41,10 @@ export const userRoutes = (app: Elysia) => {
   });
 
   app.put('/api/users/:id', async ({ body, params }) => {
-    const { email, password, name, img } = body as userProps;
+    const { email, password, name } = body as userProps;
     const updateData: Record<string, unknown> = {
       email,
       name,
-      image: img || null,
     };
     try {
       if (password) {

@@ -46,6 +46,19 @@ export const taskRoutes = (app: Elysia) => {
       console.log('error select all task -> ', error);
     }
   });
+  app.get('/api/task/:uid', async ({ params }) => {
+    const uid = params.uid.replace(':', ''); // remove leading colon
+
+    try {
+      const res = await supabaseClient
+        .from('tasks')
+        .select()
+        .eq('auth_user_id', uid);
+      return res;
+    } catch (error) {
+      console.log('error select all task -> ', error);
+    }
+  });
   app.delete('/api/task/:id', async ({ params }) => {
     console.log(params.id);
     try {

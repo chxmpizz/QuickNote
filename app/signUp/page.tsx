@@ -1,8 +1,6 @@
 'use client';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
@@ -12,19 +10,51 @@ import Image from 'next/image';
 import Test1Image from '../public/test1.png';
 import { supabaseClient } from '@/server/libs/supabase-client';
 import { useRouter } from 'next/navigation';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+export const signUpSchema = z.object({
+  name: z.string().min(2, 'Please input your name at least 2 character'),
+  email: z.email('Please input your email'),
+  password: z
+    .string()
+    .min(8, 'Please input your password')
+    .regex(/^(?=.*[A-Z]).{8,}$/, {
+      message:
+        'Should Contain at least one uppercase letter and have a minimum length of 8 characters.',
+    }),
+});
 
 interface signUpProps {
   email: string;
-  password: string;
+  password: string | 'Other Provider';
   name: string;
+  uuid?: string | null;
+  provider?: string | undefined;
 }
 
 const SignUp = () => {
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  });
   const route = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const handleSignUp = async ({ email, password, name }: signUpProps) => {
+
+  const handleSignUp = async (data: z.infer<typeof signUpSchema>) => {
+    const { email, password, name } = data;
     try {
       const { data, error } = await supabaseClient.auth.signUp({
         email,
@@ -38,20 +68,34 @@ const SignUp = () => {
       if (error) {
         console.error('Sign up error:', error.message);
       } else {
-        console.log('User signed up successfully:', data.user);
+        await postData({
+          email,
+          password,
+          name,
+          uuid: data.user?.id,
+          provider: data.user?.app_metadata.provider,
+        });
         route.push('/');
       }
     } catch (error) {
       console.log('sign in error ->', error);
     }
-    await postData({ email, password, name });
   };
-  const postData = async ({ email, password, name }: signUpProps) => {
+  const postData = async ({
+    email,
+    password,
+    name,
+    uuid,
+    provider,
+  }: signUpProps) => {
+    console.log(email, password, name, uuid, provider);
     try {
       const { data } = await axios.post('http://localhost:3001/api/users', {
         email,
         password,
         name,
+        uuid,
+        provider,
       });
       if (data) {
         console.log(data);
@@ -67,75 +111,86 @@ const SignUp = () => {
       </div>
       <div className="flex h-screen w-1/2 flex-col items-center justify-center space-y-8 bg-white text-2xl">
         <div className="mb-4 text-center leading-9">
-          <p className="text-normal text-3xl">Sign Up Page</p>
+          <p className="text-3xl font-extrabold">Sign Up Page</p>
         </div>
         {/*SignIn Form*/}
-        <form
-          className="w-8/10 space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSignUp({ email, password, name });
-          }}
-        >
-          <div>
-            <Label htmlFor="email" className="inline-block text-lg">
-              Name
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Name"
-              onChange={(e) => setName(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((data) => handleSignUp(data))}
+            className="w-5/6 space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="name" className="text-xl font-semibold">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="name"
+                      className="mt-2 w-full focus-visible:border-red-300"
+                      placeholder="Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="email" className="inline-block text-lg">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="email" className="text-xl font-semibold">
+                    Email
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="email"
+                      placeholder="Email"
+                      className="mt-2 w-full focus-visible:border-red-300"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="password" className="inline-block text-lg">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="password"
+                    className="text-xl font-semibold"
+                  >
+                    Password
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="mt-2 w-full focus-visible:border-red-300"
+                      id="password"
+                      type="password"
+                      placeholder="password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor="password" className="inline-block text-lg">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 w-full focus-visible:border-red-300"
-            />
-          </div>
-
-          {/*Sign Up*/}
-          <div className="mt-7 flex flex-col items-center justify-center">
             <Button
               type="submit"
-              className="h-10 w-7/10 cursor-pointer bg-red-500 text-lg duration-300 hover:bg-red-700"
+              className="w-full cursor-pointer bg-red-500 text-lg duration-300 hover:bg-red-700"
             >
               Sign Up
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
         <div className="flex items-center justify-center">
           <p className="text-sm">
             <Link
