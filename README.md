@@ -2,7 +2,7 @@
 
 ## This is a bun and supabase learning.
 
-First, run the development server:
+First, run the development client:
 
 ```bash
 npm run dev
@@ -12,4 +12,10 @@ yarn dev
 pnpm dev
 # or
 bun dev
+```
+And , run a server side.
+```bash
+bun install
+bun api
+
 ```
